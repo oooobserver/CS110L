@@ -27,14 +27,74 @@ fn pick_a_random_word() -> String {
     String::from(words[rand::thread_rng().gen_range(0, words.len())].trim())
 }
 
-fn main() {
-    let secret_word = pick_a_random_word();
-    // Note: given what you know about Rust so far, it's easier to pull characters out of a
-    // vector than it is to pull them out of a string. You can get the ith character of
-    // secret_word by doing secret_word_chars[i].
-    let secret_word_chars: Vec<char> = secret_word.chars().collect();
-    // Uncomment for debugging:
-    // println!("random word: {}", secret_word);
+fn print(Vec: &Vec<char>, P:&Vec<char>){
+    for i in 0..Vec.len(){
+        if Vec[i]== '-'{
+            print!("{}",P[i]);
+        }else{
+            print!("{}","-");
+        }
+    }
+    print!("\n");
+}
 
-    // Your code here! :)
+fn main() {
+    let word = pick_a_random_word();
+    let mut chars: Vec<char> = word.chars().collect();
+    let mut positions = Vec::new();
+    for i in 0..chars.len(){
+        positions.push('-');
+    }
+
+    let mut chances = NUM_INCORRECT_GUESSES;
+
+
+    while chances != 0{
+        let mut flag = 1;
+        for i in &chars{
+            if *i != '-'{
+                flag = 0;
+            }
+        }
+
+        if flag == 1{
+            println!("game over, you win!");
+            break;
+        }
+      
+
+
+        print!("Please guess a letter: ");
+
+        io::stdout()
+            .flush()
+            .expect("Error flushing stdout.");
+        let mut guess = String::new();
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Error reading line.");
+
+        if let Some(char) = guess.chars().next() {
+            if chars.contains(&char){
+                println!("you are goddamn right!");
+                if let Some(index) = chars.iter().position(|&x| x == char){
+                    positions[index] = char;
+                    chars[index] = '-';
+                }else{
+                    println!("wrong");
+                }
+            }else{
+                println!("you are powerless!");
+                chances -= 1;
+                println!("remain chances are {}",chances);
+            }
+        } else {
+            println!("String is empty");
+        }
+
+        print(&chars,&positions);
+
+    }
+
+
 }
