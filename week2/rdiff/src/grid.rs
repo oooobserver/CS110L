@@ -1,4 +1,3 @@
-// Grid implemented as flat vector
 pub struct Grid {
     num_rows: usize,
     num_cols: usize,
@@ -11,9 +10,6 @@ impl Grid {
         Grid {
             num_rows: num_rows,
             num_cols: num_cols,
-            // This syntax uses the vec! macro to create a vector of zeros, initialized to a
-            // specific length
-            // https://stackoverflow.com/a/29530932
             elems: vec![0; num_rows * num_cols],
         }
     }
@@ -22,32 +18,33 @@ impl Grid {
         (self.num_rows, self.num_cols)
     }
 
-    /// Returns the element at the specified location. If the location is out of bounds, returns
-    /// None.
-    ///
-    /// Note to students: this function also could have returned Result. It's a matter of taste in
-    /// how you define the semantics; many languages raise exceptions for out-of-bounds exceptions,
-    /// but others argue that makes code needlessly complex. Here, we decided to return Option to
-    /// give you more practice with Option :) and because this similar library returns Option:
-    /// https://docs.rs/array2d/0.2.1/array2d/struct.Array2D.html
-    #[allow(unused)] // TODO: delete this line when you implement this function
+
     pub fn get(&self, row: usize, col: usize) -> Option<usize> {
-        unimplemented!();
-        // Be sure to delete the #[allow(unused)] line above
+        if row >= self.num_rows || col >= self.num_cols {
+            return None;
+        } 
+        
+        Some(self.elems[row * self.num_cols + col])
+        
     }
 
-    /// Sets the element at the specified location to the specified value. If the location is out
-    /// of bounds, returns Err with an error message.
-    #[allow(unused)] // TODO: delete this line when you implement this function
+
     pub fn set(&mut self, row: usize, col: usize, val: usize) -> Result<(), &'static str> {
-        unimplemented!();
-        // Be sure to delete the #[allow(unused)] line above
+        if row >= self.num_rows || col >= self.num_cols {
+            return Err("location is out of bounds")
+        } 
+
+        
+        self.elems[row * self.num_cols + col] = val;
+        Ok(())
+        
     }
 
     /// Prints a visual representation of the grid. You can use this for debugging.
     pub fn display(&self) {
         for row in 0..self.num_rows {
             let mut line = String::new();
+
             for col in 0..self.num_cols {
                 line.push_str(&format!("{}, ", self.get(row, col).unwrap()));
             }
