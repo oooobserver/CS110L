@@ -118,9 +118,146 @@ impl <T: PartialOrd> PartialEq for LinkedList<T>{
             }
 
         }
+
         true
     }
 }
 
 
- 
+
+// implement for take ownership
+impl <T> Iterator for LinkedList<T>{
+    type Item = T;
+    fn next(& mut self) -> Option<T>{
+        self.pop_front()
+    }
+}
+
+// implement for the borrow
+pub struct LinkedListIter<'a, T> {
+    current: &'a Option<Box<Node<T>>>,
+}
+
+
+
+
+impl <T: Clone> Iterator for LinkedListIter<'_, T>{
+    type Item = T;
+    fn next(&mut self) -> Option<T> {
+        match self.current {
+            Some(node) => {
+                let value = node.value.clone();
+                self.current = &node.next;
+                Some(value)
+            },
+            None => None,
+        }
+    }
+}
+
+impl<'a,T: Clone> IntoIterator for &'a LinkedList<T> {
+    type Item = T;
+    type IntoIter = LinkedListIter<'a,T>;
+    fn into_iter(self) -> LinkedListIter<'a,T> {
+        LinkedListIter {current: &self.head}
+    }
+}
+
+pub trait ComputeNorm {
+    fn compute_norm(&self) -> f64 {
+        0.0
+    }
+}
+
+
+impl ComputeNorm for LinkedList<f64> {
+    fn compute_norm(&self) -> f64 {
+        let mut sq_sum = 0.0;
+        for x in self {
+            sq_sum += x * x;
+        }
+        sq_sum.sqrt()
+    }
+}
+
+
+
+
+
+
+
+#[cfg(test)]
+mod test
+{
+    use super::*;
+    #[test]
+    fn test_copy() {
+        let mut list1: LinkedList<u32> = LinkedList::new();
+        for i in 1..12 {
+            list1.push_front(i);
+        }
+        let list2 = list1.clone();
+
+        let equal = list1 == list2;
+        assert!(equal);
+    }
+
+    #[test]
+
+    fn test_compare_different_size(){
+        let mut list1: LinkedList<u32> = LinkedList::new();
+        for i in 1..12 {
+            list1.push_front(i);
+        }
+
+        let mut list2: LinkedList<u32> = LinkedList::new();
+        for i in 1..13 {
+            list2.push_front(i);
+        }
+
+        let equal = list1 == list2;
+        assert!(!equal);
+    }
+
+    #[test]
+
+    fn test_compare_same_size(){
+        let mut list1: LinkedList<u32> = LinkedList::new();
+        for i in 1..12 {
+            list1.push_front(i);
+        }
+
+        let mut list2: LinkedList<u32> = LinkedList::new();
+        for i in 2..13 {
+            list2.push_front(i);
+        }
+
+        let equal = list1 == list2;
+        assert!(!equal);
+    }
+
+    #[test]
+    fn test_iter_take(){
+        let mut list1: LinkedList<u32> = LinkedList::new();
+        for i in 1..12 {
+            list1.push_front(i);
+        }
+        for i in list1{
+            println!("{}",i);
+        }
+    }
+
+    #[test]
+    fn test_iter_borrow(){
+        let mut list1: LinkedList<u32> = LinkedList::new();
+        for i in 1..12 {
+            list1.push_front(i);
+        }
+        for i in &list1{
+            println!("{}",i);
+        }
+    }
+
+    
+
+}
